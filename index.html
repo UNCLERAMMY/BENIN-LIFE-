@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Benin Life</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#111820;color:white;font-family:Arial,sans-serif}
+header{padding:15px;background:#18232d;display:flex;justify-content:space-between;align-items:center}
+h1{font-size:23px;margin:0;color:#70e69a}
+#stats{font-size:14px;line-height:1.8}
+canvas{display:block;width:100%;height:auto;background:#8acb78;touch-action:none}
+.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:12px;max-width:420px;margin:auto}
+button{border:0;border-radius:12px;background:#273846;color:white;font-size:22px;padding:16px;touch-action:manipulation}
+button:active{background:#39835a}
+#job{display:block;width:calc(100% - 24px);max-width:396px;margin:0 auto 12px;background:#178448;font-size:17px}
+footer{text-align:center;color:#c4d0d8;font-size:12px;padding:10px}
+</style>
+</head>
+<body>
+<header>
+<h1>BENIN LIFE 🇳🇬</h1>
+<div id="stats">Cash: ₦0<br>Energy: 100</div>
+</header>
+<canvas id="game" width="360" height="500"></canvas>
+<div class="controls">
+<div></div><button id="up">▲</button><div></div>
+<button id="left">◀</button><button id="down">▼</button><button id="right">▶</button>
+</div>
+<button id="job">🚕 Complete a delivery job (+₦500)</button>
+<footer>BENIN CITY • Prototype 0.1 • Offline demo</footer>
+<script>
+const c=document.getElementById('game'),x=c.getContext('2d');
+let px=180,py=250,cash=0,energy=100,step=12;
+function draw(){
+x.fillStyle='#87bf72';x.fillRect(0,0,360,500);
+// roads
+x.fillStyle='#555b60';x.fillRect(0,100,360,100);x.fillRect(95,0,80,500);
+x.strokeStyle='#f4e6a0';x.lineWidth=2;x.setLineDash([15,12]);
+x.beginPath();x.moveTo(0,150);x.lineTo(360,150);x.moveTo(135,0);x.lineTo(135,500);x.stroke();x.setLineDash([]);
+// buildings
+function building(a,b,w,h,col,label){
+x.fillStyle='#34383d';x.fillRect(a+4,b+5,w,h);
+x.fillStyle=col;x.fillRect(a,b,w,h);
+x.fillStyle='#d7e8e9';
+for(let i=a+8;i<a+w-5;i+=20)for(let j=b+9;j<b+h-5;j+=22)x.fillRect(i,j,10,12);
+x.fillStyle='white';x.font='bold 10px Arial';x.fillText(label,a+3,b+h+13);
+}
+building(12,20,65,60,'#d28e54','SHOP');
+building(205,20,120,65,'#dfb86d','MAMA PUT');
+building(200,230,130,75,'#bc795e','BENIN MARKET');
+building(15,235,60,80,'#dfd1a1','STORE');
+building(205,340,120,100,'#c3c8cd','HOME');
+building(12,350,65,75,'#bda0cf','BANK');
+// player
+x.fillStyle='rgba(0,0,0,.25)';x.beginPath();x.ellipse(px,py+13,12,5,0,0,7);x.fill();
+x.fillStyle='#174eae';x.fillRect(px-8,py-3,16,18);
+x.fillStyle='#f0bb91';x.beginPath();x.arc(px,py-10,8,0,7);x.fill();
+x.fillStyle='#242424';x.fillRect(px-8,py-17,16,5);
+x.fillStyle='white';x.font='bold 11px Arial';x.fillText('YOU',px-11,py+29);
+}
+function move(dx,dy){px=Math.max(10,Math.min(350,px+dx));py=Math.max(20,Math.min(480,py+dy));draw()}
+[['up',0,-step],['down',0,step],['left',-step,0],['right',step,0]].forEach(([id,dx,dy])=>{
+document.getElementById(id).addEventListener('click',()=>move(dx,dy));
+});
+document.getElementById('job').addEventListener('click',()=>{
+if(energy<20){alert('Rest first! Energy is low.');return}
+cash+=500;energy-=20;
+document.getElementById('stats').innerHTML='Cash: ₦'+cash.toLocaleString()+'<br>Energy: '+energy;
+if(energy===0)document.getElementById('job').textContent='😴 Rest and recover';
+if(energy===0)document.getElementById('job').onclick=()=>{energy=100;document.getElementById('stats').innerHTML='Cash: ₦'+cash.toLocaleString()+'<br>Energy: '+energy;document.getElementById('job').textContent='🚕 Complete a delivery job (+₦500)';document.getElementById('job').onclick=null};
+});
+draw();
+</script>
+</body>
+</html>
